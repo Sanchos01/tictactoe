@@ -7,9 +7,6 @@
 # General application configuration
 use Mix.Config
 
-config :tictactoe,
-  ecto_repos: [Tictactoe.Repo]
-
 # Configures the endpoint
 config :tictactoe, TictactoeWeb.Endpoint,
   url: [host: "localhost"],

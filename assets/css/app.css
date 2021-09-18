@@ -1,6 +1,16 @@
 /* This file is for your main application css. */
 @import "./phoenix.css";
 
+#board {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+}
+
+.cell {
+  display: block;
+}
+
 /* Alerts and form errors */
 .alert {
   padding: 15px;

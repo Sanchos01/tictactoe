@@ -1,0 +1,3 @@
+<%= for {_coordinates, value} <- @board do %>
+  <%= render_cell(@conn, value) %>
+<% end %>

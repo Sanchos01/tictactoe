@@ -7,14 +7,10 @@ defmodule Tictactoe.Application do
 
   def start(_type, _args) do
     children = [
-      # Start the Ecto repository
-      # Tictactoe.Repo,
       # Start the Telemetry supervisor
       TictactoeWeb.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: Tictactoe.PubSub},
-      # Start Presence
-      TictactoeWeb.Presence,
       # Start the Endpoint (http/https)
       TictactoeWeb.Endpoint
       # Start a worker by calling: Tictactoe.Worker.start_link(arg)

@@ -30,12 +30,12 @@ defmodule TictactoeWeb.Telemetry do
         unit: {:native, :millisecond}
       ),
 
-      # Database Metrics
-      summary("tictactoe.repo.query.total_time", unit: {:native, :millisecond}),
-      summary("tictactoe.repo.query.decode_time", unit: {:native, :millisecond}),
-      summary("tictactoe.repo.query.query_time", unit: {:native, :millisecond}),
-      summary("tictactoe.repo.query.queue_time", unit: {:native, :millisecond}),
-      summary("tictactoe.repo.query.idle_time", unit: {:native, :millisecond}),
+      # # Database Metrics
+      # summary("tictactoe.repo.query.total_time", unit: {:native, :millisecond}),
+      # summary("tictactoe.repo.query.decode_time", unit: {:native, :millisecond}),
+      # summary("tictactoe.repo.query.query_time", unit: {:native, :millisecond}),
+      # summary("tictactoe.repo.query.queue_time", unit: {:native, :millisecond}),
+      # summary("tictactoe.repo.query.idle_time", unit: {:native, :millisecond}),
 
       # VM Metrics
       summary("vm.memory.total", unit: {:byte, :kilobyte}),

@@ -29,12 +29,6 @@ defmodule TictactoeWeb.ChannelCase do
   end
 
   setup _tags do
-    # :ok = Ecto.Adapters.SQL.Sandbox.checkout(Tictactoe.Repo)
-
-    # unless tags[:async] do
-    #   Ecto.Adapters.SQL.Sandbox.mode(Tictactoe.Repo, {:shared, self()})
-    # end
-
     :ok
   end
 end
