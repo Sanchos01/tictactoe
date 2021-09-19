@@ -1,14 +1,44 @@
 /* This file is for your main application css. */
 @import "./phoenix.css";
 
-#board {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
+.buttons {
+  display: block;
+  text-align: center;
+  border-bottom: 1px solid #e3e3e3;
+}
+
+.message {
+  display: block;
+  text-align: center;
 }
 
 .cell {
   display: block;
+  background-color: #eee;
+  border-color: black;
+  border-width: 0.1em;
+  border-style: solid;
+}
+
+.active_cell {
+  background-color: rgb(248, 247, 159);
+}
+
+.img_value {
+  display: block;
+  margin: 0 auto;
+}
+
+#board {
+  display: grid;
+  margin-top: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1rem;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  height: 200px;
+  width: 200px;
 }
 
 /* Alerts and form errors */
