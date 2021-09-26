@@ -29,6 +29,10 @@
   margin: 0 auto;
 }
 
+.difficulty {
+  margin-bottom: 0rem;
+}
+
 #board {
   display: grid;
   margin-top: 1rem;

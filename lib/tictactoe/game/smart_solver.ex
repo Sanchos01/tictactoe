@@ -20,7 +20,7 @@ defmodule Tictactoe.Game.SmartSolver do
   end
 
   defp check_board(board, mark) do
-    variants = Solver.get_variants(board, mark) |> IO.inspect(label: "VARS")
+    variants = Solver.get_variants(board, mark)
 
     if Enum.any?(variants, fn {{type, _coordinates}, _count} ->
          type in ~w(end defense)a
