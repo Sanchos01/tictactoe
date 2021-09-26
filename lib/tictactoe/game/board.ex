@@ -5,9 +5,14 @@ defmodule Tictactoe.Game.Board do
   @type line() :: coordinate()
   @type column() :: coordinate()
   @type coordinates() :: {line(), column()}
-  @type t() :: %{coordinates() => cell_value()}
+  @type fields() :: %{coordinates() => cell_value()}
+  @type winner() :: :x | :o | :noone
 
-  @empty_board for x <- 1..3, y <- 1..3, into: %{}, do: {{x, y}, nil}
+  @empty_fields for x <- 1..3, y <- 1..3, into: %{}, do: {{x, y}, nil}
+
+  defstruct fields: @empty_fields, winner: nil
+
+  @type t() :: %__MODULE__{fields: fields(), winner: winner() | nil}
 
   @lines [
     {{1, 1}, {1, 2}, {1, 3}},
@@ -21,16 +26,23 @@ defmodule Tictactoe.Game.Board do
   ]
 
   @spec new :: t()
-  def new(), do: @empty_board
+  def new(), do: %__MODULE__{}
 
   @spec lines() :: list({coordinates(), coordinates(), coordinates()})
   def lines(), do: @lines
 
   @spec put_mark(t(), coordinates(), mark()) :: {:ok, t()} | {:error, any()}
-  def put_mark(board, coordinates, mark) do
+  def put_mark(board, coordinates, mark)
+
+  def put_mark(%{winner: winner}, _coordinates, _mark) when not is_nil(winner) do
+    {:error, "board already with winner: #{inspect(winner)}"}
+  end
+
+  def put_mark(board, coordinates, mark) when mark in ~w(x o)a do
     case get_cell_value(board, coordinates) do
       nil ->
-        new_board = Map.put(board, coordinates, mark)
+        new_fields = Map.put(board.fields, coordinates, mark)
+        new_board = update_winner(%{board | fields: new_fields})
         {:ok, new_board}
 
       _mark ->
@@ -38,18 +50,9 @@ defmodule Tictactoe.Game.Board do
     end
   end
 
-  @spec someone_win?(t()) :: nil | {:ok, mark() | nil}
+  @spec someone_win?(t()) :: winner()
   def someone_win?(board) do
-    if any_cell_empty?(board) do
-      Enum.reduce_while(@lines, nil, fn {cell1, cell2, cell3}, acc ->
-        case check_line(board, cell1, cell2, cell3) do
-          nil -> {:cont, acc}
-          winner -> {:halt, {:ok, winner}}
-        end
-      end)
-    else
-      {:ok, nil}
-    end
+    board.winner
   end
 
   @spec contrmark(mark()) :: mark()
@@ -59,12 +62,34 @@ defmodule Tictactoe.Game.Board do
 
   @spec get_cell_value(t(), coordinates()) :: cell_value()
   def get_cell_value(board, coordinates) do
-    Map.fetch!(board, coordinates)
+    Map.fetch!(board.fields, coordinates)
+  end
+
+  @spec is_empty?(t()) :: boolean()
+  def is_empty?(board) do
+    Enum.all?(board.fields, fn {_coord, value} -> is_nil(value) end)
+  end
+
+  @spec update_winner(t()) :: t()
+  def update_winner(board) do
+    winner =
+      if any_cell_empty?(board) do
+        Enum.reduce_while(@lines, nil, fn {cell1, cell2, cell3}, acc ->
+          case check_line(board, cell1, cell2, cell3) do
+            nil -> {:cont, acc}
+            winner -> {:halt, winner}
+          end
+        end)
+      else
+        :noone
+      end
+
+    %{board | winner: winner}
   end
 
   @spec any_cell_empty?(t()) :: boolean()
   defp any_cell_empty?(board) do
-    Enum.any?(board, fn {_coord, value} -> is_nil(value) end)
+    Enum.any?(board.fields, fn {_coord, value} -> is_nil(value) end)
   end
 
   @spec check_line(t(), coordinates(), coordinates(), coordinates()) :: cell_value()

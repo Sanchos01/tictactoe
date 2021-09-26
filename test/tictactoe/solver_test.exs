@@ -56,7 +56,7 @@ defmodule Tictactoe.SolverTest do
           new_acc
       end
 
-    assert {:ok, nil} = Board.someone_win?(final_board)
+    assert :noone = Board.someone_win?(final_board)
   end
 
   test "preset board - :x will win" do
@@ -77,6 +77,17 @@ defmodule Tictactoe.SolverTest do
           new_acc
       end
 
-    assert {:ok, :x} = Board.someone_win?(final_board)
+    assert :x = Board.someone_win?(final_board)
+  end
+
+  test "end game" do
+    visual_board = {
+      {:o, nil, :x},
+      {nil, :x, nil},
+      {:o, :o, :x}
+    }
+
+    board = BoardHelper.from_visual(visual_board)
+    assert {:ok, {2, 3}} = Solver.find_solution(board, :x)
   end
 end

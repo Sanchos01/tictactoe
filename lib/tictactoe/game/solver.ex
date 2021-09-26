@@ -1,4 +1,5 @@
 defmodule Tictactoe.Game.Solver do
+  require Logger
   alias Tictactoe.Game.Board
 
   @type type() :: :end | :defense | :no_reason | :combination | :contra | :empty
@@ -10,12 +11,26 @@ defmodule Tictactoe.Game.Solver do
   def find_solution(board, mark) do
     # q: does it necessary to check win?
     case Board.someone_win?(board) do
-      {:ok, _} -> {:error, "game ended"}
-      nil -> {:ok, check_board(board, mark)}
+      nil ->
+        {:ok, board |> get_variants(mark) |> find_best_variant()}
+
+      result ->
+        Logger.error("can't make move, game result: #{inspect(result)}")
+        {:error, "game ended"}
     end
   end
 
-  defp check_board(board, mark) do
+  @spec lower_type(type()) :: nil | type()
+  def lower_type(type)
+  def lower_type(:end), do: :defense
+  def lower_type(:defense), do: :combination
+  def lower_type(:combination), do: :contra
+  def lower_type(:contra), do: :empty
+  def lower_type(:empty), do: :no_reason
+  def lower_type(:no_reason), do: nil
+
+  @spec get_variants(Board.t(), Board.mark()) :: variants()
+  def get_variants(board, mark) do
     Board.lines()
     |> Enum.reduce(%{}, fn {coordinates1, coordinates2, coordinates3}, variants ->
       v1 = Board.get_cell_value(board, coordinates1)
@@ -23,16 +38,52 @@ defmodule Tictactoe.Game.Solver do
       v3 = Board.get_cell_value(board, coordinates3)
       check_line({coordinates1, v1}, {coordinates2, v2}, {coordinates3, v3}, mark, variants)
     end)
-    |> find_best_variant()
   end
 
   @spec check_line(cell(), cell(), cell(), Board.mark(), variants()) :: variants()
-  defp check_line(cell1, cell2, cell3, mark, variants) do
+  def check_line(cell1, cell2, cell3, mark, variants) do
     cells = [cell1, cell2, cell3]
     my_marks = count_marks(cells, mark)
     contrmark = Board.contrmark(mark)
     opposite_marks = count_marks(cells, contrmark)
     add_variants(my_marks, opposite_marks, cells, variants)
+  end
+
+  @spec find_best_variant(variants()) :: Board.coordinates()
+  def find_best_variant(variants) do
+    [{{best_type, _coordinates}, _count} | _] =
+      sorted_variants =
+      Enum.sort(variants, fn {{type1, _}, _}, {{type2, _}, _} -> sorting_by_type(type1, type2) end)
+
+    case Enum.filter(sorted_variants, fn {{type, _coordinates}, _count} -> type == best_type end) do
+      [{{_type, coordinates}, _count}] ->
+        coordinates
+
+      [_ | _] = best_cells ->
+        variants
+        |> Stream.filter(fn {{type, coordinates}, _count} ->
+          type == best_type or
+            Enum.any?(best_cells, fn {{_type, best_coordinates}, _count} ->
+              best_coordinates == coordinates
+            end)
+        end)
+        |> group_variants()
+        |> best_of_the_best(best_type)
+    end
+  end
+
+  @spec group_variants(variants()) :: [{Board.coordinates(), %{type() => integer()}}]
+  def group_variants(variants) do
+    variants
+    |> Enum.group_by(fn {{_type, coordinates}, _count} -> coordinates end)
+    |> Enum.map(fn {coordinates, list_cells} ->
+      types =
+        Enum.reduce(list_cells, %{}, fn {{type, _coordinates}, count}, acc ->
+          Map.put(acc, type, count)
+        end)
+
+      {coordinates, types}
+    end)
   end
 
   @spec add_variants(count_in_line(), count_in_line(), [cell()], variants()) :: variants()
@@ -88,58 +139,27 @@ defmodule Tictactoe.Game.Solver do
     Map.update(variants, key, 1, fn v -> v + 1 end)
   end
 
-  @spec find_best_variant(variants()) :: Board.coordinates()
-  defp find_best_variant(variants) do
-    [{{best_type, _coordinates}, _count} | _] =
-      sorted_variants =
-      Enum.sort(variants, fn {{type1, _}, _}, {{type2, _}, _} -> sorting_by_type(type1, type2) end)
-
-    case Enum.filter(sorted_variants, fn {{type, _coordinates}, _count} -> type == best_type end) do
-      [{{_type, coordinates}, _count}] ->
-        coordinates
-
-      [_ | _] = best_cells ->
-        variants
-        |> Stream.filter(fn {{type, coordinates}, _count} ->
-          type == best_type or
-            Enum.any?(best_cells, fn {{_type, best_coordinates}, _count} ->
-              best_coordinates == coordinates
-            end)
-        end)
-        |> Enum.group_by(fn {{_type, coordinates}, _count} -> coordinates end)
-        |> Enum.map(fn {coordinates, list_cells} ->
-          types =
-            Enum.reduce(list_cells, %{}, fn {{type, _coordinates}, count}, acc ->
-              Map.put(acc, type, count)
-            end)
-
-          {coordinates, types}
-        end)
-        |> best_of_the_best(best_type)
-    end
-  end
-
   @spec best_of_the_best([{Board.coordinates(), %{type() => integer()}}], type()) ::
           Board.coordinates()
-  defp best_of_the_best(list_variants, type)
+  defp best_of_the_best(grouped_variants, type)
   defp best_of_the_best([{coordinates, _}], _type), do: coordinates
 
-  defp best_of_the_best(list_values, nil) do
-    list_values
+  defp best_of_the_best(grouped_variants, nil) do
+    grouped_variants
     |> Stream.map(fn {coordinates, _types} -> coordinates end)
     |> Enum.random()
   end
 
-  defp best_of_the_best(list_variants, type) do
+  defp best_of_the_best(grouped_variants, type) do
     max_type_count =
-      Enum.reduce(list_variants, 0, fn {_coordinates, types}, acc ->
+      Enum.reduce(grouped_variants, 0, fn {_coordinates, types}, acc ->
         case Map.get(types, type) do
           new_count when is_integer(new_count) and new_count > acc -> new_count
           _ -> acc
         end
       end)
 
-    list_variants
+    grouped_variants
     |> Enum.reject(fn {_coordinates, types} ->
       Map.get(types, type, 0) < max_type_count
     end)
@@ -148,25 +168,9 @@ defmodule Tictactoe.Game.Solver do
 
   @spec sorting_by_type(type(), type()) :: boolean()
   defp sorting_by_type(type1, type2)
-  defp sorting_by_type(:end, _), do: true
-  defp sorting_by_type(_, :end), do: false
-  defp sorting_by_type(:defense, _), do: true
-  defp sorting_by_type(_, :defense), do: false
-  defp sorting_by_type(:combination, _), do: true
-  defp sorting_by_type(_, :combination), do: false
-  defp sorting_by_type(:contra, _), do: true
-  defp sorting_by_type(_, :contra), do: false
-  defp sorting_by_type(:empty, _), do: true
-  defp sorting_by_type(_, :empty), do: false
-  defp sorting_by_type(:no_reason, _), do: true
-  defp sorting_by_type(_, :no_reason), do: false
 
-  @spec lower_type(type()) :: nil | type()
-  defp lower_type(type)
-  defp lower_type(:end), do: :defense
-  defp lower_type(:defense), do: :combination
-  defp lower_type(:combination), do: :contra
-  defp lower_type(:contra), do: :empty
-  defp lower_type(:empty), do: :no_reason
-  defp lower_type(:no_reason), do: nil
+  for type <- ~w(end defense combination contra empty no_reason)a do
+    defp sorting_by_type(unquote(type), _), do: true
+    defp sorting_by_type(_, unquote(type)), do: false
+  end
 end
