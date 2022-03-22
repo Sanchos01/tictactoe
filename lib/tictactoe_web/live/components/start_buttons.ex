@@ -15,7 +15,6 @@ defmodule TictactoeWeb.Components.StartButtonsLive do
       <button phx-click="play_with_bot">Play with bot</button>
       <button phx-click="play_with_neural">Play with neural</button>
       <button phx-click="train">Train neural</button>
-      <%= render_difficulty(assigns) %>
     """
   end
 
@@ -24,27 +23,22 @@ defmodule TictactoeWeb.Components.StartButtonsLive do
       <button phx-click="play_with_bot">Restart</button>
       <button phx-click="play_with_neural">Play with neural</button>
       <button phx-click="train">Train neural</button>
-      <%= render_difficulty(assigns) %>
     """
   end
 
   defp render_buttons(assigns = %{state: :neural}) do
     ~H"""
-      <button phx-click="play_with_bot">Restart</button>
-      <button phx-click="play_with_neural">Play with neural</button>
+      <button phx-click="play_with_bot">Play with bot</button>
+      <button phx-click="play_with_neural">Restart</button>
       <button phx-click="train">Train neural</button>
-      <%= render_difficulty(assigns) %>
     """
   end
 
-  defp render_difficulty(assigns = %{difficulty: difficulty}) do
+  defp render_buttons(assigns = %{state: :training}) do
     ~H"""
-      <form phx-change="difficulty" class="difficulty">
-        Bot difficulty
-        <select id="difficulty" name="difficulty">
-          <%= options_for_select([Normal: "normal", High: "high"], difficulty) %>
-        </select>
-      </form>
+      <button phx-click="play_with_bot">Play with bot</button>
+      <button phx-click="play_with_neural">Play with neural</button>
+      <button phx-click="train">Train neural</button>
     """
   end
 end

@@ -36,12 +36,12 @@ defmodule TictactoeWeb.PageLive do
 
   @impl true
   def handle_event("play_with_neural", _, socket) do
-    {:noreply, socket}
+    {:noreply, assign(socket, state: :neural)}
   end
 
   @impl true
   def handle_event("train", _, socket) do
-    {:noreply, socket}
+    {:noreply, assign(socket, state: :training)}
   end
 
   @impl true

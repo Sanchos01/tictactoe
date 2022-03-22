@@ -67,23 +67,17 @@ defmodule Tictactoe.Game.Solver do
               best_coordinates == coordinates
             end)
         end)
-        |> group_variants()
+        |> Enum.group_by(fn {{_type, coordinates}, _count} -> coordinates end)
+        |> Enum.map(fn {coordinates, list_cells} ->
+          types =
+            Enum.reduce(list_cells, %{}, fn {{type, _coordinates}, count}, acc ->
+              Map.put(acc, type, count)
+            end)
+
+          {coordinates, types}
+        end)
         |> best_of_the_best(best_type)
     end
-  end
-
-  @spec group_variants(variants()) :: [{Board.coordinates(), %{type() => integer()}}]
-  def group_variants(variants) do
-    variants
-    |> Enum.group_by(fn {{_type, coordinates}, _count} -> coordinates end)
-    |> Enum.map(fn {coordinates, list_cells} ->
-      types =
-        Enum.reduce(list_cells, %{}, fn {{type, _coordinates}, count}, acc ->
-          Map.put(acc, type, count)
-        end)
-
-      {coordinates, types}
-    end)
   end
 
   @spec add_variants(count_in_line(), count_in_line(), [cell()], variants()) :: variants()

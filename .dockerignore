@@ -1,0 +1,7 @@
+/_build
+/deps
+/.dialyzer_plts
+/.elixir_ls
+/test
+/.github
+/cover

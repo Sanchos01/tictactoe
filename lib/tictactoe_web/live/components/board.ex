@@ -5,22 +5,45 @@ defmodule TictactoeWeb.Components.BoardLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <section class="board">
-      <div id="board">
+    <section class="boards">
+      <%= render_difficulty(assigns) %>
+      <%= render_field(assigns) %>
+    </section>
+    <%= render_message(%{status: @status, mark: @mark}) %>
+    """
+  end
+
+  defp render_field(assigns = %{state: state}) when state in ~w(nil bot)a do
+    ~H"""
+    <div class="board">
+      <%= BoardView.render("board.html", assigns) %>
+    </div>
+    """
+  end
+
+  defp render_field(assigns = %{state: state}) when state in ~w(neural training)a do
+    ~H"""
+    <div class="neural_field">
+      <div class="board">
         <%= BoardView.render("board.html", assigns) %>
       </div>
+      <div class="board">
+        <%= BoardView.render("board.html", assigns) %>
+      </div>
+    </div>
+    """
+  end
+
+  defp render_message(assigns = %{status: nil}) do
+    ~H"""
+    <section class="message">
+      Choose what to play with
     </section>
-    <%= render_message(@status, @mark) %>
     """
   end
 
-  defp render_message(nil, _mark) do
-    ~E"""
-    """
-  end
-
-  defp render_message(status, mark) do
-    ~E"""
+  defp render_message(assigns = %{status: status, mark: mark}) do
+    ~H"""
     <section class="message">
       <%= status_to_text(status, mark) %>
     </section>
@@ -45,5 +68,16 @@ defmodule TictactoeWeb.Components.BoardLive do
 
   defp status_to_text(:draw, _mark) do
     "Draw"
+  end
+
+  defp render_difficulty(assigns = %{difficulty: difficulty}) do
+    ~H"""
+      <form phx-change="difficulty" class="difficulty">
+        Bot difficulty
+        <select id="difficulty" name="difficulty">
+          <%= options_for_select([Normal: "normal", High: "high"], difficulty) %>
+        </select>
+      </form>
+    """
   end
 end

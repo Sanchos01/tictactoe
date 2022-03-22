@@ -50,7 +50,7 @@ defmodule Tictactoe.Game.Board do
     end
   end
 
-  @spec someone_win?(t()) :: winner()
+  @spec someone_win?(t()) :: winner() | nil
   def someone_win?(board) do
     board.winner
   end
