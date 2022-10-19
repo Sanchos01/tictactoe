@@ -45,9 +45,9 @@ defmodule Tictactoe.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:exla, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "exla"},
-      {:nx, "~> 0.1.0-dev", github: "elixir-nx/nx", sparse: "nx", override: true},
-      {:axon, "~> 0.1.0-dev", github: "elixir-nx/axon"}
+      {:axon, "~> 0.2.0-dev", github: "elixir-nx/axon"},
+      {:exla, "~> 0.2", github: "elixir-nx/nx", sparse: "exla", override: true},
+      {:nx, "~> 0.2", github: "elixir-nx/nx", sparse: "nx", override: true}
     ]
   end
 

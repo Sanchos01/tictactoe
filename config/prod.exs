@@ -10,7 +10,7 @@ import Config
 # which you should run after static files are built and
 # before starting your production server.
 config :tictactoe, TictactoeWeb.Endpoint,
-http: [port: System.get_env("PORT")],
+  http: [port: System.get_env("PORT")],
   url: [scheme: "https", host: "tictactoe-ex.herokuapp.com", port: 443],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),

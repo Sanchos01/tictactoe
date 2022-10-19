@@ -7,6 +7,7 @@ defmodule Tictactoe.Application do
 
   def start(_type, _args) do
     children = [
+      Tictactoe.Neural.Supervisor,
       # Start the Telemetry supervisor
       TictactoeWeb.Telemetry,
       # Start the PubSub system

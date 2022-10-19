@@ -1,4 +1,4 @@
-defmodule Tictactoe.SmartSolverTest do
+defmodule Tictactoe.Game.SmartSolverTest do
   use ExUnit.Case, async: false
   alias Tictactoe.Game.{Board, Solver, SmartSolver}
   alias Tictactoe.Test.Board, as: BoardHelper
