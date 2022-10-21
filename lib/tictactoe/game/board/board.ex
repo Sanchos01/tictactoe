@@ -29,9 +29,21 @@ defmodule Tictactoe.Game.Board do
     import Inspect.Algebra
 
     def inspect(board, opts) do
-      first = Map.take(board.fields, [{1, 1}, {1, 2}, {1, 3}]) |> Map.to_list() |> Enum.map(fn {_, x} -> x end)
-      second = Map.take(board.fields, [{2, 1}, {2, 2}, {2, 3}]) |> Map.to_list() |> Enum.map(fn {_, x} -> x end)
-      third = Map.take(board.fields, [{3, 1}, {3, 2}, {3, 3}]) |> Map.to_list() |> Enum.map(fn {_, x} -> x end)
+      first =
+        Map.take(board.fields, [{1, 1}, {1, 2}, {1, 3}])
+        |> Map.to_list()
+        |> Enum.map(fn {_, x} -> x end)
+
+      second =
+        Map.take(board.fields, [{2, 1}, {2, 2}, {2, 3}])
+        |> Map.to_list()
+        |> Enum.map(fn {_, x} -> x end)
+
+      third =
+        Map.take(board.fields, [{3, 1}, {3, 2}, {3, 3}])
+        |> Map.to_list()
+        |> Enum.map(fn {_, x} -> x end)
+
       winner = board.winner
 
       concat([

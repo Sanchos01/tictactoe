@@ -41,7 +41,7 @@ defmodule Tictactoe.Neural.Training do
     model
     |> Axon.Loop.trainer(loss, optimizer)
     |> Axon.Loop.metric(:accuracy)
-    |> Axon.Loop.run(data, compiler: EXLA, epochs: 5)
+    |> Axon.Loop.run(data, %{}, compiler: EXLA, epochs: 5)
   end
 
   @spec train_one_board(Axon.t(), Enumerable.t(), Board.mark()) :: any()
@@ -90,7 +90,8 @@ defmodule Tictactoe.Neural.Training do
             nil
         end
       end,
-      orderred: false, max_concurrency: 5
+      orderred: false,
+      max_concurrency: 5
     )
     |> Stream.map(fn {:ok, x} -> x end)
     |> Stream.filter(&(not is_nil(&1)))

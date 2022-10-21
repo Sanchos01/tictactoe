@@ -6,7 +6,7 @@ defmodule Tictactoe.Neural.Model do
 
   @spec model() :: Axon.t()
   def model() do
-    Axon.input({nil, 2, 9}, "input")
+    Axon.input("input", shape: {nil, 2, 9})
     |> Axon.flatten()
     |> Axon.dense(108, activation: :sigmoid)
     |> Axon.dropout(rate: 0.3)

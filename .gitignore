@@ -34,3 +34,4 @@ npm-debug.log
 
 /.dialyzer_plts/
 /.elixir_ls/
+/.vscode/
