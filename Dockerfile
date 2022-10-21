@@ -1,4 +1,4 @@
-FROM elixir:1.12-alpine as asset-builder-mix-getter
+FROM elixir:1.13-alpine as asset-builder-mix-getter
 
 ENV HOME=/app
 
@@ -13,7 +13,7 @@ WORKDIR $HOME
 RUN mix deps.get
 
 ########################################################################
-FROM elixir:1.12-alpine as releaser
+FROM elixir:1.13-alpine as releaser
 
 ENV HOME=/app
 
