@@ -9,11 +9,11 @@ defmodule TictactoeWeb.Components.BoardLive do
       <%= render_difficulty(assigns) %>
       <%= render_field(assigns) %>
     </section>
-    <%= render_message(%{status: @status, mark: @mark}) %>
+    <%= render_message(%{status: @status, mark: @mark, message: @message}) %>
     """
   end
 
-  defp render_field(assigns = %{state: state}) when state in ~w(nil bot)a do
+  defp render_field(assigns = %{state: state}) when state in ~w(nil bot neural)a do
     ~H"""
     <div class="board">
       <%= BoardView.render("board.html", assigns) %>
@@ -21,7 +21,7 @@ defmodule TictactoeWeb.Components.BoardLive do
     """
   end
 
-  defp render_field(assigns = %{state: state}) when state in ~w(neural training)a do
+  defp render_field(assigns = %{state: state}) when state in ~w(training)a do
     ~H"""
     <div class="neural_field">
       <div class="board">
@@ -31,6 +31,14 @@ defmodule TictactoeWeb.Components.BoardLive do
         <%= BoardView.render("board.html", assigns) %>
       </div>
     </div>
+    """
+  end
+
+  defp render_message(assigns = %{message: message}) when not is_nil(message) do
+    ~H"""
+    <section class="message">
+      <%= message %>
+    </section>
     """
   end
 
@@ -68,6 +76,11 @@ defmodule TictactoeWeb.Components.BoardLive do
 
   defp status_to_text(:draw, _mark) do
     "Draw"
+  end
+
+  defp render_difficulty(assigns = %{state: state}) when state in ~w(neural training)a do
+    ~H"""
+    """
   end
 
   defp render_difficulty(assigns = %{difficulty: difficulty}) do

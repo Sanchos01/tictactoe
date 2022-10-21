@@ -36,17 +36,12 @@ defmodule Tictactoe.Game.Solver do
       v1 = Board.get_cell_value(board, coordinates1)
       v2 = Board.get_cell_value(board, coordinates2)
       v3 = Board.get_cell_value(board, coordinates3)
-      check_line({coordinates1, v1}, {coordinates2, v2}, {coordinates3, v3}, mark, variants)
+      cells = [{coordinates1, v1}, {coordinates2, v2}, {coordinates3, v3}]
+      my_marks = count_marks(cells, mark)
+      contrmark = Board.contrmark(mark)
+      opposite_marks = count_marks(cells, contrmark)
+      add_variants(my_marks, opposite_marks, cells, variants)
     end)
-  end
-
-  @spec check_line(cell(), cell(), cell(), Board.mark(), variants()) :: variants()
-  def check_line(cell1, cell2, cell3, mark, variants) do
-    cells = [cell1, cell2, cell3]
-    my_marks = count_marks(cells, mark)
-    contrmark = Board.contrmark(mark)
-    opposite_marks = count_marks(cells, contrmark)
-    add_variants(my_marks, opposite_marks, cells, variants)
   end
 
   @spec find_best_variant(variants()) :: Board.coordinates()

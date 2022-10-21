@@ -25,6 +25,41 @@ defmodule Tictactoe.Game.Board do
     {{1, 3}, {2, 2}, {3, 1}}
   ]
 
+  defimpl Inspect, for: Tictactoe.Game.Board do
+    import Inspect.Algebra
+
+    def inspect(board, opts) do
+      first =
+        Map.take(board.fields, [{1, 1}, {1, 2}, {1, 3}])
+        |> Map.to_list()
+        |> Enum.map(fn {_, x} -> x end)
+
+      second =
+        Map.take(board.fields, [{2, 1}, {2, 2}, {2, 3}])
+        |> Map.to_list()
+        |> Enum.map(fn {_, x} -> x end)
+
+      third =
+        Map.take(board.fields, [{3, 1}, {3, 2}, {3, 3}])
+        |> Map.to_list()
+        |> Enum.map(fn {_, x} -> x end)
+
+      winner = board.winner
+
+      concat([
+        "#Board<",
+        to_doc(first, opts),
+        "|",
+        to_doc(second, opts),
+        "|",
+        to_doc(third, opts),
+        "|winner:",
+        to_doc(winner, opts),
+        ">"
+      ])
+    end
+  end
+
   @spec new :: t()
   def new(), do: %__MODULE__{}
 
@@ -85,6 +120,39 @@ defmodule Tictactoe.Game.Board do
       end
 
     %{board | winner: winner}
+  end
+
+  @spec random_board(integer()) :: {t(), mark()}
+  def random_board(marks_count)
+  def random_board(0), do: {new(), :x}
+
+  def random_board(marks_count) when marks_count > 8 or marks_count < 0,
+    do: raise("wrong marks_count")
+
+  def random_board(marks_count) do
+    board = new()
+    mark_to_put = if rem(marks_count, 2) == 0, do: :x, else: :o
+
+    [:x, :o]
+    |> Stream.cycle()
+    |> Enum.take(marks_count)
+    |> Enum.reduce_while(board, fn mark, board ->
+      coordinates =
+        board.fields
+        |> Stream.filter(fn {_, x} -> is_nil(x) end)
+        |> Enum.map(fn {x, _} -> x end)
+        |> Enum.random()
+
+      case put_mark(board, coordinates, mark) do
+        {:ok, %{winner: winner}} when not is_nil(winner) -> {:halt, :error}
+        {:ok, board} -> {:cont, board}
+        {:error, _} -> {:halt, :error}
+      end
+    end)
+    |> case do
+      :error -> random_board(marks_count)
+      board -> {board, mark_to_put}
+    end
   end
 
   @spec any_cell_empty?(t()) :: boolean()

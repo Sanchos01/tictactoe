@@ -1,6 +1,6 @@
 language: elixir
 elixir:
-  - 1.12.2
+  - 1.13.2
 otp_release:
   - 24.0
 script:

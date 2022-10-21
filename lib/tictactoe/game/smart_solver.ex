@@ -130,7 +130,7 @@ defmodule Tictactoe.Game.SmartSolver do
     |> find_best_result()
   end
 
-  def find_best_result(results) do
+  defp find_best_result(results) do
     best_result =
       Enum.reduce(results, :lose, fn
         {:win, _scores, _coordinates}, _ -> :win

@@ -36,7 +36,19 @@ defmodule TictactoeWeb.PageLive do
 
   @impl true
   def handle_event("play_with_neural", _, socket) do
-    {:noreply, assign(socket, state: :neural)}
+    board = Board.new()
+
+    socket =
+      if :rand.uniform(2) == 1 do
+        # Player make move
+        assign(socket, mark: :x, status: :move)
+      else
+        # Bot make move
+        t = Task.async(fn -> Tictactoe.Neural.Prepared.predict(board, :x) end)
+        assign(socket, mark: :o, bot_resp: t, status: :await)
+      end
+
+    {:noreply, assign(socket, board: board, state: :neural)}
   end
 
   @impl true
@@ -59,8 +71,21 @@ defmodule TictactoeWeb.PageLive do
   @impl true
   def handle_info({ref, {:ok, coordinates}}, %{assigns: %{bot_resp: %Task{ref: ref}}} = socket) do
     bot_mark = Board.contrmark(socket.assigns.mark)
-    {:ok, board} = Board.put_mark(socket.assigns.board, coordinates, bot_mark)
-    socket |> assign(board: board) |> check_winner(:bot)
+
+    case Board.put_mark(socket.assigns.board, coordinates, bot_mark) do
+      {:ok, board} ->
+        socket |> assign(board: board) |> check_winner(:bot)
+
+      _ ->
+        socket =
+          socket
+          |> assign(
+            status: {:winner, socket.assigns.mark},
+            message: "Wrong response from bot, you win"
+          )
+
+        {:noreply, socket}
+    end
   end
 
   @impl true
@@ -82,7 +107,13 @@ defmodule TictactoeWeb.PageLive do
         case previous_move do
           :user ->
             bot_mark = Board.contrmark(mark)
-            t = Task.async(fn -> solver(difficulty).find_solution(board, bot_mark) end)
+
+            t =
+              case socket.assigns.state do
+                :bot -> Task.async(fn -> solver(difficulty).find_solution(board, bot_mark) end)
+                :neural -> Task.async(fn -> Tictactoe.Neural.Prepared.predict(board, :x) end)
+              end
+
             {:noreply, assign(socket, status: :await, bot_resp: t)}
 
           :bot ->
