@@ -107,17 +107,15 @@ defmodule Tictactoe.Game.Board do
 
   @spec update_winner(t()) :: t()
   def update_winner(board) do
+    acc = if any_cell_empty?(board), do: nil, else: :noone
+
     winner =
-      if any_cell_empty?(board) do
-        Enum.reduce_while(@lines, nil, fn {cell1, cell2, cell3}, acc ->
-          case check_line(board, cell1, cell2, cell3) do
-            nil -> {:cont, acc}
-            winner -> {:halt, winner}
-          end
-        end)
-      else
-        :noone
-      end
+      Enum.reduce_while(@lines, acc, fn {cell1, cell2, cell3}, acc ->
+        case check_line(board, cell1, cell2, cell3) do
+          nil -> {:cont, acc}
+          winner -> {:halt, winner}
+        end
+      end)
 
     %{board | winner: winner}
   end
