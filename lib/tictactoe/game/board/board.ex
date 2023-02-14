@@ -49,11 +49,11 @@ defmodule Tictactoe.Game.Board do
       concat([
         "#Board<",
         to_doc(first, opts),
-        "|",
+        ",",
         to_doc(second, opts),
-        "|",
+        ",",
         to_doc(third, opts),
-        "|winner:",
+        ",winner:",
         to_doc(winner, opts),
         ">"
       ])

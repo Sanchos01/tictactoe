@@ -20,7 +20,6 @@ defmodule Tictactoe.Neural.Training do
 
   @spec generate_target_tensor(Board.t(), Board.mark()) :: Nx.t()
   def generate_target_tensor(board, mark_to_put) do
-    # IO.puts "board: #{inspect board}, mark: #{inspect mark_to_put}"
     for {coordinates, mark} <- board.fields do
       if is_nil(mark) do
         make_score(board, coordinates, mark_to_put)
@@ -29,7 +28,6 @@ defmodule Tictactoe.Neural.Training do
       end
     end
     |> find_best_target()
-    # |> IO.inspect(label: "T")
     |> Nx.tensor()
   end
 

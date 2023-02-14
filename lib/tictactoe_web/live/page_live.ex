@@ -31,7 +31,7 @@ defmodule TictactoeWeb.PageLive do
         assign(socket, mark: :o, bot_resp: t, status: :await)
       end
 
-    {:noreply, assign(socket, board: board, state: :bot)}
+    {:noreply, assign(socket, board: board, state: :bot, message: nil)}
   end
 
   @impl true
@@ -48,7 +48,7 @@ defmodule TictactoeWeb.PageLive do
         assign(socket, mark: :o, bot_resp: t, status: :await)
       end
 
-    {:noreply, assign(socket, board: board, state: :neural)}
+    {:noreply, assign(socket, board: board, state: :neural, message: nil)}
   end
 
   @impl true
