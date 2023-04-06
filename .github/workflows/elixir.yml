@@ -9,16 +9,20 @@ on:
 jobs:
   build:
 
-    name: Build and test
+    name: Build and test OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+    strategy:
+      matrix:
+        otp: ['25.1.2.1']
+        elixir: ['1.14.2']
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Elixir
-      uses: erlef/setup-elixir@885971a72ed1f9240973bd92ab57af8c1aa68f24
+    - uses: actions/checkout@v3
+    - name: Set up
+      uses: erlef/setup-beam@v1
       with:
-        elixir-version: '1.14.2' # Define the elixir version [required]
-        otp-version: '25.1.2.1' # Define the OTP version [required]
+        elixir-version: ${{matrix.elixir}} # Define the elixir version [required]
+        otp-version: ${{matrix.otp}} # Define the OTP version [required]
     - name: Restore dependencies cache
       uses: actions/cache@v2
       with:
