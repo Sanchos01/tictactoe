@@ -1,3 +1,0 @@
-<%= for {coordinates, value} <- @board.fields do %>
-  <%= render_cell(%{socket: @socket, status: @status, coordinates: coordinates, value: value}) %>
-<% end %>

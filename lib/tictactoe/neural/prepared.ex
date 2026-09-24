@@ -3,22 +3,22 @@ defmodule Tictactoe.Neural.Prepared do
   alias Tictactoe.Neural.{Model, Training}
   alias Tictactoe.Game.Board
 
-  if Mix.env() == :test do
-    @boards [{0, 1}]
-  else
-    @boards Stream.cycle([
-              {0, 10},
-              {1, 20},
-              {2, 20},
-              {3, 30},
-              {4, 40},
-              {5, 40},
-              {6, 30},
-              {7, 30},
-              {8, 20}
-            ])
-            |> Enum.take(540)
-  end
+  # if Mix.env() == :test do
+  #   @boards [{0, 1}]
+  # else
+  #   @boards Stream.cycle([
+  #             {0, 10},
+  #             {1, 20},
+  #             {2, 20},
+  #             {3, 30},
+  #             {4, 40},
+  #             {5, 40},
+  #             {6, 30},
+  #             {7, 30},
+  #             {8, 20}
+  #           ])
+  #           |> Enum.take(540)
+  # end
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
@@ -31,7 +31,8 @@ defmodule Tictactoe.Neural.Prepared do
   def handle_continue(:generate, _state) do
     # data = Training.generate_data(@boards)
     # |> Stream.concat(Training.generate_smart_data(@boards))
-    data = Training.generate_smart_data(@boards)
+    # data = Training.generate_smart_data(@boards)
+    data = Training.generate_all_data()
     params = Training.train(Model.model(), data)
     {:noreply, %{params: params}}
   end

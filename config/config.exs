@@ -10,6 +10,7 @@ import Config
 # Configures the endpoint
 config :tictactoe, TictactoeWeb.Endpoint,
   url: [host: "localhost"],
+  adapter: Bandit.PhoenixAdapter,
   secret_key_base: "2djRmsTyXAs7pB1QYYtG7RVNgJ7gx31ASUNtkbjCXku6gmw8cDJfYFjpqu4V0omF",
   render_errors: [view: TictactoeWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: Tictactoe.PubSub,

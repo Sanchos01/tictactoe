@@ -1,0 +1,5 @@
+<section>
+  <.live_component id="start" module={TictactoeWeb.Components.StartButtonsComponent} state={@state} />
+  <.live_component id="boards" module={TictactoeWeb.Components.BoardComponent} state={@state} difficulty={@difficulty} status={@status} board={@board} mark={@mark} message={@message} />
+  <.live_component id="message" module={TictactoeWeb.Components.MessageComponent} status={@status} mark={@mark} message={@message} />
+</section>

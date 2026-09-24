@@ -1,6 +1,5 @@
 defmodule TictactoeWeb.PageLive do
   use TictactoeWeb, :live_view
-  require Logger
   alias Tictactoe.Game.{Solver, SmartSolver, Board}
 
   @impl true

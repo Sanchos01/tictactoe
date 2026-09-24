@@ -1,5 +1,4 @@
 defmodule Tictactoe.Neural.Training do
-  require Axon
   alias Tictactoe.Game.Board
   alias Tictactoe.Game.{Solver, SmartSolver}
 
@@ -39,7 +38,7 @@ defmodule Tictactoe.Neural.Training do
     model
     |> Axon.Loop.trainer(loss, optimizer)
     |> Axon.Loop.metric(:accuracy)
-    |> Axon.Loop.run(data, %{}, compiler: EXLA, epochs: 5)
+    |> Axon.Loop.run(data, %{}, compiler: EXLA, epochs: 20)
   end
 
   @spec train_one_board(Axon.t(), Enumerable.t(), Board.mark()) :: any()
@@ -84,7 +83,8 @@ defmodule Tictactoe.Neural.Training do
             target = [generate_target_tensor(board, mark)] |> Nx.stack()
             {input, target}
 
-          {:error, _} ->
+          {:error, _error} ->
+            # Logger.error("can't generate for #{marks_count} #{solver} - #{opponent_solver}, error: #{inspect(error)}")
             nil
         end
       end,
@@ -95,7 +95,25 @@ defmodule Tictactoe.Neural.Training do
     |> Stream.filter(&(not is_nil(&1)))
   end
 
-  defp make_score(board, coordinates, mark_to_put, step \\ 0) do
+  @spec generate_all_data() :: Stream.t()
+  def generate_all_data() do
+    Board.Generator.generate_all()
+    |> Task.async_stream(
+      fn {board, mark} ->
+        input = [generate_input_tensor(board, mark)] |> Nx.stack()
+        {:ok, {x, y}} = SmartSolver.find_solution(board, mark)
+        index = (x - 1) * 3 + (y - 1)
+        output = Stream.cycle([0]) |> Enum.take(9) |> List.replace_at(index, 1) |> Nx.tensor()
+        target = [output] |> Nx.stack()
+        {input, target}
+      end,
+      orderred: false,
+      max_concurrency: 5
+    )
+    |> Stream.map(fn {:ok, x} -> x end)
+  end
+
+  def make_score(board, coordinates, mark_to_put, step \\ 0) do
     {:ok, board} = Board.put_mark(board, coordinates, mark_to_put)
 
     case Board.someone_win?(board) do

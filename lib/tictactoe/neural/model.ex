@@ -1,6 +1,5 @@
 defmodule Tictactoe.Neural.Model do
   require Logger
-  require Axon
   alias Tictactoe.Games.Board
   alias Tictactoe.Neural.Training
 
@@ -8,7 +7,7 @@ defmodule Tictactoe.Neural.Model do
   def model() do
     Axon.input("input", shape: {nil, 2, 9})
     |> Axon.flatten()
-    |> Axon.dense(108, activation: :sigmoid)
+    |> Axon.dense(180, activation: :sigmoid)
     |> Axon.dropout(rate: 0.3)
     |> Axon.dense(9, activation: :softmax)
   end

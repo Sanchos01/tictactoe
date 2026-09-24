@@ -26,6 +26,54 @@ defmodule Tictactoe.Game.Board.Generator do
     generate_smart_try(marks_count, solver, opponent_solver)
   end
 
+  @spec generate_all() :: [{Board.t(), Board.mark()}]
+  def generate_all() do
+    for steps <- 0..8, reduce: {[], MapSet.new()} do
+      {old_boards, acc} ->
+        new_boards = generate_steps(old_boards, steps)
+        new_acc = Enum.reduce(new_boards, acc, fn b, a -> MapSet.put(a, b) end)
+        {new_boards, new_acc}
+    end
+    |> then(fn {_, r} -> MapSet.to_list(r) end)
+  end
+
+  @spec generate_steps([{Board.t(), Board.mark()}], integer()) :: [{Board.t(), Board.mark()}]
+  def generate_steps(_boards, 0) do
+    [{Board.new(), :x}]
+  end
+
+  def generate_steps(boards, steps) do
+    mark_to_put = if rem(steps, 2) == 0, do: :x, else: :o
+    mark = Board.contrmark(mark_to_put)
+
+    boards
+    |> Enum.map(fn {b, _m} -> b end)
+    |> add_steps([mark])
+    |> Enum.map(fn b -> {b, mark_to_put} end)
+  end
+
+  @spec add_steps([Board.t()], [Board.mark()]) :: [Board.t()]
+  def add_steps(boards, marks)
+
+  def add_steps(boards, []), do: boards
+
+  def add_steps(boards, [mark | marks]) do
+    Enum.reduce(boards, [], fn board, acc ->
+      new_boards =
+        board.fields
+        |> Stream.filter(fn {_c, v} -> is_nil(v) end)
+        |> Stream.map(fn {c, _v} -> c end)
+        |> Stream.map(fn c ->
+          {:ok, b} = Board.put_mark(board, c, mark)
+          b
+        end)
+        |> Enum.filter(fn b -> is_nil(Board.someone_win?(b)) end)
+
+      new_boards ++ acc
+    end)
+    |> add_steps(marks)
+  end
+
   defp generate_smart_try(marks_count, solver, opponent_solver, count \\ 0)
 
   defp generate_smart_try(_marks_count, _solver, _opponent_solver, count) when count >= 5 do

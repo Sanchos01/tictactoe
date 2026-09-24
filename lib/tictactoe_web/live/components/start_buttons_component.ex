@@ -1,4 +1,4 @@
-defmodule TictactoeWeb.Components.StartButtonsLive do
+defmodule TictactoeWeb.Components.StartButtonsComponent do
   use TictactoeWeb, :live_component
 
   @impl true
